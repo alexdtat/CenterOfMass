@@ -41,16 +41,14 @@ void MolecularDynamics::makeSystemDimensionless() {
 }
 
 // Dimensionless
-std::array<double, 3> MolecularDynamics::getForce(int particle_ind_a, int particle_ind_b) {
-    Particle particleA = particles[particle_ind_a];
-    Particle particleB = particles[particle_ind_b];
+std::array<double, 3> MolecularDynamics::getForce(int particleIndA, int particleIndB) {
+    Particle particleA = particles[particleIndA];
+    Particle particleB = particles[particleIndB];
     double difX = particleA.coordinates[0] - particleB.coordinates[0];
     double difY = particleA.coordinates[1] - particleB.coordinates[1];
     double difZ = particleA.coordinates[2] - particleB.coordinates[2];
     double r = sqrt(difX * difX + difY * difY + difZ * difZ);
-    // double sr = sigma / r;
-    // double cf = -24.0 * epsilon * (pow(sr, 7.0) - 2 * pow(sr, 13.0)) / r;
-    double cf = -24.0 * (pow(r, -7.0) - 2 * pow(r, -13.0)) / r;
+    double cf = -24.0 * sigma * (pow(r, -7.0) - 2 * pow(r, -13.0)) / r;
     auto f = std::array<double, 3>();
     for (int j = 0; j < 3; j++) {
         f[j] = cf * (particleA.coordinates[j] - particleB.coordinates[j]);
@@ -59,37 +57,35 @@ std::array<double, 3> MolecularDynamics::getForce(int particle_ind_a, int partic
     return f;
 }
 
-void MolecularDynamics::updateAcceleration(int particle_ind) {
+void MolecularDynamics::updateAcceleration(int particleInd) {
     for (int i = 0; i < particles.size(); i++) {
-        if (i != particle_ind) {
-            auto fi = getForce(particle_ind, i);
+        if (i != particleInd) {
+            auto fi = getForce(particleInd, i);
             for (int j = 0; j < 3; j++) {
-                // f[j] += fi[j];
-                particles[particle_ind].acceleration[j] += fi[j];
+                particles[particleInd].acceleration[j] += fi[j];
             }
         }
     }
 }
 
-void MolecularDynamics::updateVelocity(int particle_ind) {
+void MolecularDynamics::updateVelocity(int particleInd) {
     for (int j = 0; j < 3; j++) {
-        particles[particle_ind].velocity[j] += particles[particle_ind].acceleration[j] * dt;
+        particles[particleInd].velocity[j] += particles[particleInd].acceleration[j] * dt;
     }
 }
 
-void MolecularDynamics::updateCoordinates(int particle_ind) {
-    // auto bufferParticle = bufferParticles[particle_ind];
+void MolecularDynamics::updateCoordinates(int particleInd) {
     for (int j = 0; j < 3; j++) {
-        particles[particle_ind].coordinates[j] +=
-                particles[particle_ind].velocity[j] * dt + particles[particle_ind].acceleration[j] * dt * dt / 2.0;
-        double diff = fabs(particles[particle_ind].coordinates[j]) - halfSize;
+        particles[particleInd].coordinates[j] +=
+                particles[particleInd].velocity[j] * dt + particles[particleInd].acceleration[j] * dt * dt / 2.0;
+        double diff = fabs(particles[particleInd].coordinates[j]) - halfSize;
         if (diff > 0.0) {
-            if (particles[particle_ind].coordinates[j] > 0.0) {
-                particles[particle_ind].coordinates[j] = halfSize - diff;
+            if (particles[particleInd].coordinates[j] > 0.0) {
+                particles[particleInd].coordinates[j] = halfSize - diff;
             } else {
-                particles[particle_ind].coordinates[j] = -halfSize + diff;
+                particles[particleInd].coordinates[j] = -halfSize + diff;
             }
-            particles[particle_ind].velocity[j] *= -1;
+            particles[particleInd].velocity[j] *= -1;
         }
     }
 }
@@ -205,6 +201,6 @@ void MolecularDynamics::showTrajectory(int particleInd) {
 
     particlePathFile.close();
 
-    std::string command = "python drawer.py -f ./particlePathFile.txt";
+    std::string command = "python ../src/MolecularDynamics/drawer.py -f ../src/MolecularDynamics/particlePathFile.txt";
     std::system(command.c_str());
 }

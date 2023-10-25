@@ -27,10 +27,10 @@ class MolecularDynamics {
     const double kB = 8.617333262e-5; // eV/K
 
     void makeSystemDimensionless();
-    std::array<double, 3> getForce(int particle_ind_a, int particle_ind_b);
-    void updateAcceleration(int particle_ind);
-    void updateVelocity(int particle_ind);
-    void updateCoordinates(int particle_ind);
+    std::array<double, 3> getForce(int particleIndA, int particleIndB);
+    void updateAcceleration(int particleInd);
+    void updateVelocity(int particleInd);
+    void updateCoordinates(int particleInd);
     std::array<double, 3> calculateCenterOfMass();
     void updateSystem();
     void vrand_MB(std::array<double, 3>& v, double *u) const;
