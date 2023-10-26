@@ -178,11 +178,13 @@ MolecularDynamics::MolecularDynamics(int nParticlesNew, double mNew, double cube
 void MolecularDynamics::startSimulation(int nStepsNew) {
     nSteps = nStepsNew;
     statesHistory.push_back(particles);
+    centerOfMassHistory.push_back(centerOfMass);
     for (step = 0; step < nSteps; step++) {
         updateSystem();
         statesHistory.push_back(particles);
         if (step % 5 == 0) {
-            estimatedCenterOfMass = calculateCenterOfMass();
+            centerOfMass = calculateCenterOfMass();
+            centerOfMassHistory.push_back(centerOfMass);
         }
         time += dt;
     }
@@ -202,5 +204,22 @@ void MolecularDynamics::showTrajectory(int particleInd) {
     particlePathFile.close();
 
     std::string command = "python ../src/MolecularDynamics/drawer.py -f ../src/MolecularDynamics/particlePathFile.txt";
+    std::system(command.c_str());
+}
+
+void MolecularDynamics::showCenterOfMassChanges() {
+    std::ofstream particlePathFile;
+    particlePathFile.open("../src/MolecularDynamics/centerOfMassChanges.txt");
+
+    particlePathFile << (nSteps / 5) + 1 << "\n";
+    for (int i = 0; i <= (nSteps / 5); i++) {
+        particlePathFile << centerOfMassHistory[i][0] << " "
+                         << centerOfMassHistory[i][1] << " "
+                         << centerOfMassHistory[i][2] << "\n";
+    }
+
+    particlePathFile.close();
+
+    std::string command = "python ../src/MolecularDynamics/drawer.py -f ../src/MolecularDynamics/centerOfMassChanges.txt";
     std::system(command.c_str());
 }

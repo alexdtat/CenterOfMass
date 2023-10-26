@@ -22,6 +22,7 @@ int main() {
     auto particleTrajectory = std::tuple<std::vector<double>, std::vector<double>, std::vector<double>> {xs, ys, zs};
 
     simulation.showTrajectory(0);
+    // simulation.showCenterOfMassChanges();
 
     return 0;
 }

@@ -37,15 +37,17 @@ class MolecularDynamics {
     void vrand_MB_eq(std::array<double,3>& v) const;
 
     public:
-        std::array<double, 3> estimatedCenterOfMass = {0.0, 0.0, 0.0};
+        std::array<double, 3> centerOfMass = {0.0, 0.0, 0.0};
         std::vector<Particle> particles;
         std::vector<std::vector<Particle>> statesHistory;
+        std::vector<std::array<double, 3>> centerOfMassHistory;
         double cubeSize = 1.0;
         double halfSize = 0.5;
 
         MolecularDynamics(int nParticlesNew, double mNew, double cubeSizeNew, double sigmaNew, double epsilonNew, double temperatureNew, double dtNew);
         void startSimulation (int nStepsNew);
         void showTrajectory (int particleInd);
+        void showCenterOfMassChanges();
 };
 
 
